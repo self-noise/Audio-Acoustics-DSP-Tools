@@ -55,14 +55,12 @@ switch isempty(varargin)
         end
 end
 
-
 %------------------------------------------------------------------------%
 % Calculate frequency vector
 %------------------------------------------------------------------------%
 N   = size(x,1);
 df  = Fs/N;
 f   = 0:df:Fs-df;
-
 
 %------------------------------------------------------------------------%
 % Calculate and plot FFTs
@@ -100,6 +98,4 @@ linkaxes(ax,'x');
 % Maximise figure
 set(fig_ffts,'Position',get(0,'Screensize'));
 set(ax,'FontSize',figFont-2)
-
-
 
