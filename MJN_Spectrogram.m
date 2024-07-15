@@ -2,16 +2,18 @@
 % FUNCTION NAME AND BASIC SPECIFICATION
 %
 %   [specData] = ...
-%           MJN_Spectrogram(params,audioData)
+%           MJN_spectrogram(params,audioData)
 %---------------------------------------------------------------------------------------------%
-% Author:   Dr Mike Newton
-% Date:     May 2024
-% Location: [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% Author:           Dr Mike Newton
+% Date:             May 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP__git/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
-%           (1) Produces a spectrogram of a time series signal(s)
+%           (1) Produces a spectrogram plot of a discrete time signal(s) that is passed to it 
+%           as a vector or matrix of numbers
 %---------------------------------------------------------------------------------------------%
-% *INPUTS*:
+% INPUTS:
 %           params                      Structure containing all control parameters
 %               .Fs                     Sample rate of audio signals
 %               .windowSize_ms          The length or type of the analysis frame.
@@ -42,18 +44,22 @@
 %           audioData:  time domain signal (can be single or multichannel,
 %                       ordered as columns in a single matrix)
 %
-% *OUTPUTS*:
+% OUTPUTS:
 %           specData (spectrogram as a matrix of frames)
 %
 %---------------------------------------------------------------------------------------------%
 % GENERAL USAGE NOTES:
 %   NOTE 1:
 %---------------------------------------------------------------------------------------------%
+% CHANGES TO ADD AT SOME POINT IN THE FUTURE:
+%   "specData" changes size on each loop, adding a new entry to the structure for each channel in
+%   sequence. This should be optimised/pre-allocated.
+%---------------------------------------------------------------------------------------------%
 % CHANGELOG:
-%   2024-XX-XX: TBC
+%   2024-07-15: Updated filename for adding to GitHub
 %   2024-05-09: Initial coding
 %---------------------------------------------------------------------------------------------%
-function [specData] = MJN_Spectrogram(params,audioData)
+function [specData] = MJN_spectrogram(params,audioData)
 
 N_channels      = size(audioData,2);
 Ts              = 1/params.Fs;

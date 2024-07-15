@@ -4,9 +4,10 @@
 %   [SC_normalised_frames,SC_frames,frame_RMS_levels,tVec_FrameCentres] = ...
 %           MJN_SpectralCentroid_SlidingWindow(params,audioData)
 %---------------------------------------------------------------------------------------------%
-% Author:   Dr Mike Newton
-% Date:     February 2024
-% Location: [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% Author:           Dr Mike Newton
+% Date:             February 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP_git/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
 %           (1) Computes the normalised spectral centroid (NSC) of a time domain signal
@@ -17,7 +18,7 @@
 %               Note that by use of appropriate input parameters (see below), you can simply
 %               return the NSC for the whole file (per channel).
 %---------------------------------------------------------------------------------------------%
-% *INPUTS*:
+% INPUTS:
 %           params                      Structure containing all control parameters
 %               .Fs                     Sample rate of audio signals
 %               .params.f_expected      The reference frequency for NSC
@@ -57,7 +58,7 @@
 %           audioData                   Time domain signal (can be single or multichannel, 
 %                                       ordered as columns in a single matrix)
 %
-% *OUTPUTS*:
+% OUTPUTS:
 %           NSC_frames                  Normalised spectral centroid (by f_expected)
 %           SC_frames                   Spectral centroid
 %           frame_RMS_levels            RMS levels of each frame
@@ -66,6 +67,10 @@
 %---------------------------------------------------------------------------------------------%
 % GENERAL USAGE NOTES:
 %   NOTE 1:
+%---------------------------------------------------------------------------------------------%
+% CHANGES TO ADD AT SOME POINT IN THE FUTURE:
+%   "specData" changes size on each loop, adding a new entry to the structure for each channel in
+%   sequence. This should be optimised/pre-allocated.
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
 %   2024-04-22: Edited to make genuinely multichannel compatible (i.e., more than 2 channels),

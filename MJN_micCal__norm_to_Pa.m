@@ -3,9 +3,10 @@
 %
 %   [params] = MJN_micCal__norm_to_Pa(params)
 %---------------------------------------------------------------------------------------------%
-% Author:   Dr Mike Newton
-% Date:     April 2024
-% Location: [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% Author:           Dr Mike Newton
+% Date:             April 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
 %   Microphone calibration for acoustics research
@@ -14,7 +15,7 @@
 %       ---->   i.e., take digital signal(s) and multiply by this number(s) to obtain signals
 %               expressed in real world acoustic units
 %---------------------------------------------------------------------------------------------%
-% *INPUTS*
+% INPUTS
 %   params.
 %       micCalType: 'singleRef' (only 1 mic calibration is provided, any others done using
 %                           manufacturer specs relative to this)
@@ -27,7 +28,7 @@
 %       micXX:      At least one entry 'params.micXX' (starting with 'params.mic01') that provides
 %                   metatdata for a microphone to be calibrated
 %
-% *OUTPUTS*
+% OUTPUTS
 %   params.
 %       micXX.mic_calibration_factor :  This is a single number and provides scaling for the given
 %                                       mic from digital/normalised units to real world acoustic
@@ -45,6 +46,10 @@
 %           ('params.N_Mics'), as a whole positive number. If you specify '3' mics
 %           (params.N_Mics=3) but include fewer or more sets of mic metadata, an error will be
 %           thrown
+%---------------------------------------------------------------------------------------------%
+% CHANGES TO ADD AT SOME POINT IN THE FUTURE:
+%   "specData" changes size on each loop, adding a new entry to the structure for each channel in
+%   sequence. This should be optimised/pre-allocated.
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
 %   2024-04-22:     Created this function as a standalone place to calibrate measurement

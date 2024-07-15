@@ -12,18 +12,6 @@
 %   Performs a simple least-squared regression on a 1-dimensional dataset (x- and y-values 
 %   given by the user), with a customisable order of fit (linear, quadratic, etc)
 %---------------------------------------------------------------------------------------------%
-% INPUTS:
-%   xData       : Column of x-axis points
-%   yData       : Column of corresponding y-axis points
-%   order       : 1 for linear, 2 for quadratic, etc
-%
-% OUTPUTS:
-%   LS_Soln     : Vector of size (1,N_order+1) with coeffs. of the LS fit
-%   varargout{1}: Overall 'error' metric ('R-squared')
-%   varargout{2}: Vector of y-values that lie along LS curve (i.e., the
-%                 specific preductions of 'y' for each 'x' values in the
-%                 input data), to allow easy/quick plotting of data return
-%---------------------------------------------------------------------------------------------%
 % GENERAL USAGE NOTES:
 %   NOTE 1: T
 %---------------------------------------------------------------------------------------------%
@@ -31,10 +19,26 @@
 %   TBC
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
-%   2024-02-28:     Changed function name and altered output to produce R-squared value as first
-%                   optional output argument
 %   2018-04-02:     Created this function as a quick way to do linear data fit 'by hand'
 %---------------------------------------------------------------------------------------------%
+
+
+% Updates   : 28/02/2024 (changed function name and altered output to
+%             produce R-squared
+%-------------------------------------------------------------------------%
+% INPUTS:
+%   xData       : Column of x-axis points
+%   yData       : Column of corresponding y-axis points
+%   order       : 1 for linear, 2 for quadratic, etc
+%
+% OUTPUTS:
+%
+%   LS_Soln     : Vector of size (1,N_order+1) with coeffs. of the LS fit
+%   varargout{1}: Overall 'error' metric ('R-squared')
+%   varargout{2}: Vector of y-values that lie along LS curve (i.e., the
+%                 specific preductions of 'y' for each 'x' values in the
+%                 input data), to allow easy/quick plotting of data return
+%-------------------------------------------------------------------------%
 function [LS_Soln,varargout] = MJN_LeastSquaresFit(xData,yData,N_order)
 
 Npts = length(xData);
