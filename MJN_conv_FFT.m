@@ -1,20 +1,40 @@
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$
-% Convolution operation - Carried out using FFTs
+%---------------------------------------------------------------------------------------------%
+% FUNCTION NAME AND SPECIFICATION
 %
-%           out = conv_FFT__MJN(y,ir)
+%   out = MJN_conv_fft(y,ir)
+%---------------------------------------------------------------------------------------------%
+% PURPOSE OF THIS FUNCTION:
+%   Performs linear (i.e., 'acyclic') convolution between a pair of vectors in the frequency 
+%   domain, via the FFT algorithm (with appropriate zero-padding). In typical use this would be 
+%   convolution of a 'dry' audio signal with an impulse response of some kind 'ir'.
 %
-% Inputs:
-%         y - mono/stereo input sound data
-%         ir - mono/stereo input IR data
+%   The function accepts either single-channel or two-channel files (for both 'dry' and 'ir')
+%---------------------------------------------------------------------------------------------%
+% INPUTS:
+%    y          : Mono/stereo input sound data
+%    ir         : Mono/stereo input IR data
 %
-% Outputs:
-%         out - convolved mono/stereo sound data
-%
-% Length of output is exactly the same as using Matlab's "conv" function
-%   --> i.e. nY + nIR - 1
-%   --> As per Understanding DSP
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$
-function out = conv_FFT__MJN(y,ir)
+% OUTPUTS:
+%   out         : Convolved mono/stereo sound data
+%---------------------------------------------------------------------------------------------%
+% GENERAL USAGE NOTES:
+%   Length of the output is exactly the same as when using Matlab's inbuilt "conv" function
+%   --> i.e. N_Y (number of input samples) + N_IR (number of ir samples) - 1
+%   --> More info, e.g., https://ccrma.stanford.edu/~jos/sasp/Acyclic_Convolution_Matlab.html
+%---------------------------------------------------------------------------------------------%
+% CHANGES TO ADD AT SOME POINT IN THE FUTURE:
+%   TBC
+%---------------------------------------------------------------------------------------------%
+% CHANGELOG:
+%   2024-07-17:     Changed function name and updated preamble comments
+%   2018-04-02:     Created this function as a quick way to do linear convolution
+%---------------------------------------------------------------------------------------------%
+% Author:           Dr Mike Newton
+% Date:             July 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
+%---------------------------------------------------------------------------------------------%
+function out = MJN_conv_fft(y,ir)
 
 nY       = max(size(y));
 nChans   = min(size(y));

@@ -1,5 +1,5 @@
 %---------------------------------------------------------------------------------------------%
-% FUNCTION NAME AND BASIC SPECIFICATION
+% FUNCTION NAME AND SPECIFICATION
 %
 %   [LS_Soln,varargout] = MJN_LeastSquaresFit(xData,yData,order)
 %---------------------------------------------------------------------------------------------%
