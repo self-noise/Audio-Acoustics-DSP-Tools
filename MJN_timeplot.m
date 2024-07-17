@@ -1,21 +1,21 @@
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% Program          : timeplot__MJN.m
-% Program category : AMT MSc DSP Helper program
-% Author           : Michael J. Newton
-% Date             : 03/2012
+%---------------------------------------------------------------------------------------------%
+% FUNCTION NAME AND SPECIFICATION
 %
-% Overview: This function takes any number of time domain input signals and
+%   [~] = MJN_timeplot(x,Fs,units,normOp,varargin)
+%---------------------------------------------------------------------------------------------%
+% PURPOSE OF THIS FUNCTION:
+%           This function takes any number of time domain input signals and
 %           simply plots them, either against sample number or against time
-%           in seconds.
+%           in seconds, in a reasonably nice/clear way.
+%
 %           The program works for any number of input channels, as long as
 %           they are stored in a single vector x(:,channelIndex). Normally
 %           for a stereo signal channelIndex runs from 1:2. But if this
 %           program is being called to compare multiple different signals
 %           it may run from 1:N where N is the number of different signals.
 %           Each signal is plotted in a new subplot(N,1,channelIndex).
-%
-% Inputs
+%---------------------------------------------------------------------------------------------%
+% INPUTS:
 %           x       :   Input signal to be plotted (mono or stereo or
 %                       multichannel)
 %           Fs      :   Sampling rate (Hz)
@@ -30,12 +30,27 @@
 %                       use:
 %                           [ylow1 yhigh1],[ylow1 yhigh1],[]
 %
-% Outputs
+% OUTPUTS:
 %           A new figure is ploted showing the time domain plots of the
 %           input signals
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-function timeplot__MJN(x,Fs,units,normOp,varargin)
+%---------------------------------------------------------------------------------------------%
+% GENERAL USAGE NOTES:
+%   NOTE 1:
+%---------------------------------------------------------------------------------------------%
+% CHANGES TO ADD AT SOME POINT IN THE FUTURE:
+%   TBA
+%---------------------------------------------------------------------------------------------%
+% CHANGELOG:
+%   2024-07-15: Updated filename for adding to GitHub
+%
+%   2012-05-09: Initial coding
+%---------------------------------------------------------------------------------------------%
+% Author:           Dr Mike Newton
+% Date:             July 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP__git/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
+%---------------------------------------------------------------------------------------------%
+function MJN_timeplot(x,Fs,units,normOp,varargin)
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

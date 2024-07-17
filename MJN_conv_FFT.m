@@ -23,10 +23,11 @@
 %   --> More info, e.g., https://ccrma.stanford.edu/~jos/sasp/Acyclic_Convolution_Matlab.html
 %---------------------------------------------------------------------------------------------%
 % CHANGES TO ADD AT SOME POINT IN THE FUTURE:
-%   TBC
+%   TBA
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
 %   2024-07-17:     Changed function name and updated preamble comments
+%
 %   2018-04-02:     Created this function as a quick way to do linear convolution
 %---------------------------------------------------------------------------------------------%
 % Author:           Dr Mike Newton

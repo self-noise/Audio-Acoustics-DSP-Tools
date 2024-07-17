@@ -1,13 +1,8 @@
 %---------------------------------------------------------------------------------------------%
-% FUNCTION NAME AND BASIC SPECIFICATION
+% FUNCTION NAME AND SPECIFICATION
 %
 %   [SC_normalised_frames,SC_frames,frame_RMS_levels,tVec_FrameCentres] = ...
 %           MJN_SpectralCentroid_SlidingWindow(params,audioData)
-%---------------------------------------------------------------------------------------------%
-% Author:           Dr Mike Newton
-% Date:             February 2024
-% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP_git/
-% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
 %           (1) Computes the normalised spectral centroid (NSC) of a time domain signal
@@ -73,10 +68,17 @@
 %   sequence. This should be optimised/pre-allocated.
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
+%   2024-07-17: Updated preamble for GitHub
+%
 %   2024-04-22: Edited to make genuinely multichannel compatible (i.e., more than 2 channels),
 %               in a way that is dynamic with the 'audioData' sent to this function
 %
 %   2024-02-01: Initial coding
+%---------------------------------------------------------------------------------------------%
+% Author:           Dr Mike Newton
+% Date:             July 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP_git/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 function [SC_normalised_frames,SC_frames,frame_RMS_levels,tVec_FrameCentres] = MJN_SpectralCentroid_SlidingWindow(params,audioData)
 

@@ -1,12 +1,7 @@
 %---------------------------------------------------------------------------------------------%
-% FUNCTION NAME AND BASIC SPECIFICATION
+% FUNCTION NAME AND SPECIFICATION
 %
 %   [~] = fftplot__MJN(x,Fs,plotStyle,varargin)
-%---------------------------------------------------------------------------------------------%
-% Author:           Dr Mike Newton
-% Date:             March 2012
-% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
-% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
 %   This function takes a time input signal and calculates the DFT using Matlab's FFT function. 
@@ -18,7 +13,7 @@
 %   where N is the number of different signals. 
 %   Each signal is plotted in a new subplot(N,1,channelIndex).
 %---------------------------------------------------------------------------------------------%
-% Inputs
+% INPUTS:
 %           x   :   Input signal to be analysed (mono or stereo or
 %                   multichannel)
 %           Fs  :   Sampling rate (Hz)
@@ -27,7 +22,7 @@
 %                             processing style stem plot
 %           varargin(1) : Cell array of strings for plot titles
 %
-% Outputs
+% OUTPUTS:
 %           A new figure is ploted showing the DFT of the input signal
 %---------------------------------------------------------------------------------------------%
 % GENERAL USAGE NOTES:
@@ -38,9 +33,14 @@
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
 %   2024-07-15:     Updated preamble for GitHub publication
+%
 %   2012-03-03:     Created this function as a quick way to do reasonably nice spectrum plots
 %---------------------------------------------------------------------------------------------%
-
+% Author:           Dr Mike Newton
+% Date:             July 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
+%---------------------------------------------------------------------------------------------%
 function MJN_fftplot(x,Fs,plot_style,varargin)
 
 %------------------------------------------------------------------------%

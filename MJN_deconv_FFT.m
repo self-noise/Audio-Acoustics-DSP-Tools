@@ -1,21 +1,42 @@
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$
-% Convolution operation - Carried out using FFTs
+%---------------------------------------------------------------------------------------------%
+% FUNCTION NAME AND SPECIFICATION
 %
-%           out = deconv_FFT__MJN(y,ir)
+%   out = MJN_deconv_fft(in,out)
+%---------------------------------------------------------------------------------------------%
+% PURPOSE OF THIS FUNCTION:
+%   Performs linear (i.e., 'acyclic') deconvolution between a pair of vectors in the frequency 
+%   domain, via the FFT algorithm (with appropriate zero-padding). In typical use this would be 
+%   deconvolution of the 'ouput' of a system from an 'input' to it, in order to recover the 
+%   system's impulse response
 %
-% Inputs: 
-%         in - mono/stereo input sound data
-%         out - mono/stereo output sound data
+%   The function accepts either single-channel or two-channel files (for both 'dry' and 'ir')
+%---------------------------------------------------------------------------------------------%
+% INPUTS:
+%    in          : Mono/stereo input data
+%    out         : Mono/stereo output data
 %
-% Outputs:
-%         ir - deconvolved mono/stereo sound data (usually an impulse
-%         response)
+% OUTPUTS:
+%   ir           : Deconvolved mono/stereo sound data (usually an impulse response)
+%---------------------------------------------------------------------------------------------%
+% GENERAL USAGE NOTES:
+%   Length of the output is exactly the same as when using Matlab's inbuilt "conv" function
+%   --> i.e. N_Y (number of input samples) + N_IR (number of ir samples) - 1
+%   --> More info, e.g., https://ccrma.stanford.edu/~jos/sasp/Acyclic_Convolution_Matlab.html
+%---------------------------------------------------------------------------------------------%
+% CHANGES TO ADD AT SOME POINT IN THE FUTURE:
+%   TBA
+%---------------------------------------------------------------------------------------------%
+% CHANGELOG:
+%   2024-07-17:     Changed function name and updated preamble comments
 %
-% Length of output is exactly the same as using Matlab's "conv" function
-%   --> i.e. nY + nIR - 1
-%   --> As per Understanding DSP
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$
-function ir = deconv_FFT__MJN(in,out)
+%   2018-04-02:     Created this function as a quick way to do linear deconvolution
+%---------------------------------------------------------------------------------------------%
+% Author:           Dr Mike Newton
+% Date:             July 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
+%---------------------------------------------------------------------------------------------%
+function ir = MJN_deconv_fft(in,out)
 
 nIN         = max(size(in));
 nIN_Chans   = min(size(in));
@@ -52,9 +73,9 @@ end
 
 switch nIN_Chans
     case 1
-        in   = [in;zeros(nOUT-1,1)];        
-        out  = [out(:,1);zeros(nIN-1,1)];
-        ir = ifft(fft(out)./fft(in));
+        in      = [in;zeros(nOUT-1,1)];        
+        out     = [out(:,1);zeros(nIN-1,1)];
+        ir      = ifft(fft(out)./fft(in));
     case 2
         error('More than 1 input channels supplied - cannot proceed.')
 %         switch nIRChans

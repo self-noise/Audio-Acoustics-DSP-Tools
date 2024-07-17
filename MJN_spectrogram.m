@@ -1,16 +1,10 @@
 %---------------------------------------------------------------------------------------------%
-% FUNCTION NAME AND BASIC SPECIFICATION
+% FUNCTION NAME AND SPECIFICATION
 %
-%   [specData] = ...
-%           MJN_spectrogram(params,audioData)
-%---------------------------------------------------------------------------------------------%
-% Author:           Dr Mike Newton
-% Date:             May 2024
-% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP__git/
-% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
+%   [specData] = MJN_spectrogram(params,audioData)
 %---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
-%           (1) Produces a spectrogram plot of a discrete time signal(s) that is passed to it 
+%           Produces a spectrogram plot of a discrete time signal(s) that is passed to it 
 %           as a vector or matrix of numbers
 %---------------------------------------------------------------------------------------------%
 % INPUTS:
@@ -52,12 +46,18 @@
 %   NOTE 1:
 %---------------------------------------------------------------------------------------------%
 % CHANGES TO ADD AT SOME POINT IN THE FUTURE:
-%   "specData" changes size on each loop, adding a new entry to the structure for each channel in
-%   sequence. This should be optimised/pre-allocated.
+%   "specData" changes size on each loop, adding a new entry to the structure for each channel 
+%   in sequence. This should be optimised/pre-allocated.
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
 %   2024-07-15: Updated filename for adding to GitHub
+%
 %   2024-05-09: Initial coding
+%---------------------------------------------------------------------------------------------%
+% Author:           Dr Mike Newton
+% Date:             July 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP__git/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 function [specData] = MJN_spectrogram(params,audioData)
 

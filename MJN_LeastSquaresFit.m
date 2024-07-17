@@ -3,11 +3,6 @@
 %
 %   [LS_Soln,varargout] = MJN_LeastSquaresFit(xData,yData,order)
 %---------------------------------------------------------------------------------------------%
-% Author:           Dr Mike Newton
-% Date:             April 2018
-% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
-% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
-%---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
 %   Performs a simple least-squared regression on a 1-dimensional dataset (x- and y-values 
 %   given by the user), with a customisable order of fit (linear, quadratic, etc)
@@ -33,7 +28,13 @@
 % CHANGELOG:
 %   2024-02-28:     Changed function name and altered output to produce R-squared value as first
 %                   optional output argument
+%
 %   2018-04-02:     Created this function as a quick way to do linear data fit 'by hand'
+%---------------------------------------------------------------------------------------------%
+% Author:           Dr Mike Newton
+% Date:             July 2024
+% Location (local): [Matlab_root]/LIBRARY/MJN_Code_Library/MJN_DSP/
+% GitHub location:  https://github.com/self-noise/Audio-Acoustics-DSP-Tools
 %---------------------------------------------------------------------------------------------%
 function [LS_Soln,varargout] = MJN_LeastSquaresFit(xData,yData,N_order)
 
