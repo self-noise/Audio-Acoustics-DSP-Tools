@@ -16,7 +16,7 @@
 % INPUTS:
 %           params                      Structure containing all control parameters
 %               .Fs                     Sample rate of audio signals
-%               .params.f_expected      The reference frequency for NSC
+%               .params.f0_nominal      The reference frequency for NSC
 %                                       calculations (i.e., expected
 %                                       playing frequency for the given
 %                                       note) in Hz
@@ -54,7 +54,7 @@
 %                                       ordered as columns in a single matrix)
 %
 % OUTPUTS:
-%           NSC_frames                  Normalised spectral centroid (by f_expected)
+%           NSC_frames                  Normalised spectral centroid (by f0)
 %           SC_frames                   Spectral centroid
 %           frame_RMS_levels            RMS levels of each frame
 %           tVec_FrameCentres           Time indices of each frame centre
@@ -116,7 +116,7 @@ switch options.PlotSpec
             end
 
             title(['File: ' Path_File ' --- ' params.(['mic0' num2str(nPlotChannel)]).location],'Interpreter','none')
-            xlim([params.SC_lower_bound_Hz,params.SC_upper_bound_Hz])
+            xlim([params.f0_rangeLow,params.SC_upper_bound_Hz])
         end
 end
 
@@ -197,9 +197,18 @@ elseif params.overlapFraction > 0
             'analysis (should be either a number [in ms], or the text flag "wholeSignal".'])
     end
 
+    % Zero pad the input data so it perfectly fits an integer number of frames NF
     audioData = [audioData;zeros(N_tot__thisFile_pad-N_tot__thisFile,N_channels)];
 
-    % Define a windowing function (all ones is just a square window)
+    % Make an empty vector to record the fundamental frequency (f0) estimate for each frame
+    params.f0_estimate          = zeros(NF,1);
+
+    % Make an empty vector to record the lower frequency bound of the SC analysis window (which
+    % depends on the estimated f0). Note that the upper bound is fixed as a parameter at the 
+    % start of analysis.
+    params.SC_lower_bound_Hz    = zeros(NF,1);
+
+    % Define a windowing function to apply to each frame
     switch params.windowType
         case 'Hann'
             % Manual computation of Hann window
@@ -208,11 +217,10 @@ elseif params.overlapFraction > 0
             % scaling of the frame to which it's applied
             win                  = win/(mean(win));
         case 'Rect'
-            win                  = ones(N_frame,1); % All ones (no amplitude scaling needed)
-        case 'Blackman'
-            %win                  = blackmanharris(N_frame);
-            %win                  = blackman(N_frame);
-            % Blackman window
+            % All ones (no amplitude scaling needed) means a rectangular window
+            win                  = ones(N_frame,1);
+        case 'Blackman'            
+            % Blackman window (manual computation
             win                  = (0.42 - 0.5*cos(2*pi*(0:N_frame-1)/(N_frame-1)) + 0.08*cos(4*pi*(0:N_frame-1)/(N_frame-1)))';
             win                  = win/(mean(win));            
         otherwise
@@ -229,9 +237,9 @@ elseif params.overlapFraction > 0
     %%% Derived Spectral Centroid parameters used in examining each frame %%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    % Frequency (Hz) to bin indices: Convert the user's lower/upper bounds
-    % in Hz into a bin index (note that rounding errors will occur)
-    [~,SC_lower_bin] = min(abs(fVec - params.SC_lower_bound_Hz));
+    % % Frequency (Hz) to bin indices: Convert the user's lower/upper bounds
+    % % in Hz into a bin index (note that rounding errors will occur)
+    % [~,SC_lower_bin] = min(abs(fVec - params.SC_lower_bound_Hz));
     [~,SC_upper_bin] = min(abs(fVec - params.SC_upper_bound_Hz));
 
     % Big empty matrices to store all the frames (the 'raw' version is used
@@ -243,12 +251,39 @@ elseif params.overlapFraction > 0
     % Loop over the number of channels (i.e., microphones used)
     for nChan = 1:N_channels
 
-        % Read the frames into the big matrix of slices
+        %-------------------------------------------------------------------------------------%
+        % FRAME-BY-FRAME READ IN:
+        % Read the frames into the big matrix of frame slices
+        %-------------------------------------------------------------------------------------%        
         for m=0:NF-1
             indRange                    = (m*HA)+1:(m*HA)+N_frame;
             audioData_slices_raw(:,m+1) = audioData(indRange,nChan);
             audioData_slices(:,m+1)     = audioData(indRange,nChan).*win;
-        end
+
+            % If requested, estimate f0 for the current frame (but only for channel 1)
+            switch params.f0_Method
+                case 'estimate_per_frame'
+                    if nChan==1
+                        this_f0                 = pitch(audioData_slices(:,m+1),params.Fs, Method='SRH', WindowLength=N_frame, OverlapLength=0, Range=[params.f0_rangeLow,params.f0_rangeHigh], MedianFilterLength=1);
+                        params.f0_estimate(m+1) = this_f0;
+
+                        % Set the lower bound for the SC analysis, based on the expected f0 of the
+                        % given note. Usual expectation is that this is determined by the expected
+                        % playing frequency minus a fixed offset to ensure that the DFT selection
+                        % includes everything in that vicinity whole. Usual: '-100' is about right
+                        params.SC_lower_bound_Hz(m+1) = params.f0_estimate(m+1) - params.f_lower_offset;
+                    end
+                case 'nominal'
+                    params.f0_estimate(m+1) = params.f0_nominal;
+                    params.SC_lower_bound_Hz(m+1) = params.f0_estimate(m+1) - params.f_lower_offset;
+                otherwise
+                    error('Error in "params.f0_Method": f0 can only be determined per frame ("estimate_per_frame"), or via a nominal setting ("nominal"). Set "params.f0_Method" to one of these.')
+            end
+
+            % Frequency (Hz) to bin indices: Convert the user's lower/upper bounds
+            % in Hz into a bin index (note that rounding errors will occur)
+            [~,SC_lower_bin] = min(abs(fVec - params.SC_lower_bound_Hz(m+1)));            
+        end        
 
         % Compute the RMS level of each slice (RAW slice, NOT including
         % windowing)
@@ -278,23 +313,24 @@ elseif params.overlapFraction > 0
 
         % Apply the lower/upper bounds to the frequency vector, setting all bins
         % below the lower limit to zero, and all bins above the upper limit to zero
-        fVec__halfSpec_bounds = fVec__halfSpec;
-        fVec__halfSpec_bounds(1:SC_lower_bin) = 0;
-        fVec__halfSpec_bounds(SC_upper_bin+1:end) = 0;
+        fVec__halfSpec_bounds                       = fVec__halfSpec;
+        fVec__halfSpec_bounds(1:SC_lower_bin)       = 0;
+        fVec__halfSpec_bounds(SC_upper_bin+1:end)   = 0;
 
 
         %-------------------------------------------------------------------------------------%
         % % Testing/checking only: Save time and DFT slices
         %-------------------------------------------------------------------------------------%
-        timeSliceRAW_saved{nChan}.data  = audioData_slices_raw;
-        timeSlice_saved{nChan}.data     = audioData_slices;
-        DFTSlice_saved{nChan}.data      = audioData_slices_DFT_mag_halfSpec;
-        save('blahblah','timeSliceRAW_saved','timeSlice_saved','DFTSlice_saved')
+        % timeSliceRAW_saved{nChan}.data  = audioData_slices_raw;
+        % timeSlice_saved{nChan}.data     = audioData_slices;
+        % DFTSlice_saved{nChan}.data      = audioData_slices_DFT_mag_halfSpec;
+        % save('blahblah','timeSliceRAW_saved','timeSlice_saved','DFTSlice_saved')
         %-------------------------------------------------------------------------------------%
 
-
-        % If requested, apply a noise floor threshold, setting all spectral magnitudes below
-        % this to zero
+        %-------------------------------------------------------------------------------------%
+        % NOISE THRESHOLDING: If requested, apply a noise floor threshold, setting all spectral 
+        % magnitudes below this to zero
+        %-------------------------------------------------------------------------------------%
         switch params.optionNoiseThresh
             case 0
                 % Do nothing
@@ -307,14 +343,15 @@ elseif params.overlapFraction > 0
                 error('Error: the parameter "params.optionNoiseThresh" can only be set to 0 or 1')
         end
 
-
-
-        % Spectral Centroid: MY METHOD (for each frame via a vector*matrix multiplication)
+        %-------------------------------------------------------------------------------------%
+        % SPECTRAL CENTROID: Actually calcualte it! And the normalised version!
+        % Mike's method (each frame SC via vector*matrix multiplication)
+        %-------------------------------------------------------------------------------------%
         these_SC_frames                 = (fVec__halfSpec_bounds'*audioData_slices_DFT_mag_halfSpec)./sum(audioData_slices_DFT_mag_halfSpec,1);
-        these_SC_normalised_frames      = these_SC_frames./params.f_expected;
+        these_SC_normalised_frames      = these_SC_frames'./params.f0_estimate;
+        %these_SC_normalised_frames      = these_SC_frames./params.f0_nominal;
 
 
-        
         % Clean up the latter parts of the file (if needed), chosing the first
         % channel (i.e., usually Mic01) as the reference point to ensure that all
         % returned data (SC_frames, in particular) have the same length
@@ -353,7 +390,8 @@ elseif params.overlapFraction > 0
 
         % Nearest integer bin index corresponding to expected playing frequency relative to the
         % fVec_Harmonics axis
-        k_f_expected                    = (round(params.f_expected*2)*0.5)*2;
+        k_f_expected                    = (round(mean(params.f0_estimate)*2)*0.5)*2;
+        %k_f_expected                    = (round(params.f_expected*2)*0.5)*2;        
 
         AVec_harmonics_linear           = zeros(length(fVec_Harmonics),1);        
         AVec_harmonics_linear(k_f_expected+1:k_f_expected:end)  = 1;        
@@ -374,14 +412,14 @@ elseif params.overlapFraction > 0
                         switch options.PlotSpec_Scale
                             case 'linear'                                
                                 if params.optionNoiseThresh
-                                    plot([params.SC_lower_bound_Hz,params.SC_upper_bound_Hz],params.NoiseThresh_Pa(nChan)*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
+                                    plot([mean(params.SC_lower_bound_Hz),params.SC_upper_bound_Hz],params.NoiseThresh_Pa(nChan)*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
                                     plot(fVec__halfSpec(indRangeAnalysisWindow),audioData_slices_DFT_mag_halfSpec_copy(indRangeAnalysisWindow,1:indexSoundLevelMax),'g','Parent', ax(nChan))
                                 end
                                 plot(fVec__halfSpec(indRangeAnalysisWindow),audioData_slices_DFT_mag_halfSpec(indRangeAnalysisWindow,1:indexSoundLevelMax),'Parent', ax(nChan))
                                 %plot(fVec_Harmonics,AVec_harmonics_linear,'Parent', ax(nChan),'LineWidth',figLineHarmonics,'Color','k');
                             case 'log'                                
                                 if params.optionNoiseThresh
-                                    plot([params.SC_lower_bound_Hz,params.SC_upper_bound_Hz],20*log10(params.NoiseThresh_Pa(nChan))*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
+                                    plot([mean(params.SC_lower_bound_Hz),params.SC_upper_bound_Hz],20*log10(params.NoiseThresh_Pa(nChan))*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
                                     plot(fVec__halfSpec(indRangeAnalysisWindow),20*log10(audioData_slices_DFT_mag_halfSpec_copy(indRangeAnalysisWindow,1:indexSoundLevelMax)),'g','Parent', ax(nChan))
                                 end
                                 plot(fVec__halfSpec(indRangeAnalysisWindow),20*log10(audioData_slices_DFT_mag_halfSpec(indRangeAnalysisWindow,1:indexSoundLevelMax)),'Parent', ax(nChan))
@@ -392,14 +430,14 @@ elseif params.overlapFraction > 0
                         switch options.PlotSpec_Scale
                             case 'linear'                                
                                 if params.optionNoiseThresh
-                                    plot([params.SC_lower_bound_Hz,params.SC_upper_bound_Hz],params.NoiseThresh_Pa(nChan)*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
+                                    plot([mean(params.SC_lower_bound_Hz),params.SC_upper_bound_Hz],params.NoiseThresh_Pa(nChan)*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
                                     plot(fVec__halfSpec(indRangeAnalysisWindow),audioData_slices_DFT_mag_halfSpec_copy(indRangeAnalysisWindow,indexSoundLevelMax),'g','Parent', ax(nChan))
                                 end
                                 plot(fVec__halfSpec(indRangeAnalysisWindow),audioData_slices_DFT_mag_halfSpec(indRangeAnalysisWindow,indexSoundLevelMax),'Parent', ax(nChan))
                                 %plot(fVec_Harmonics,AVec_harmonics_linear,'Parent', ax(nChan),'LineWidth',figLineHarmonics,'Color','k');
                             case 'log'                                
                                 if params.optionNoiseThresh
-                                    plot([params.SC_lower_bound_Hz,params.SC_upper_bound_Hz],20*log10(params.NoiseThresh_Pa(nChan))*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
+                                    plot([mean(params.SC_lower_bound_Hz),params.SC_upper_bound_Hz],20*log10(params.NoiseThresh_Pa(nChan))*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
                                     plot(fVec__halfSpec(indRangeAnalysisWindow),20*log10(audioData_slices_DFT_mag_halfSpec_copy(indRangeAnalysisWindow,indexSoundLevelMax)),'g','Parent', ax(nChan))
                                 end
                                 plot(fVec__halfSpec(indRangeAnalysisWindow),20*log10(audioData_slices_DFT_mag_halfSpec(indRangeAnalysisWindow,indexSoundLevelMax)),'Parent', ax(nChan))
@@ -410,14 +448,14 @@ elseif params.overlapFraction > 0
                         switch options.PlotSpec_Scale
                             case 'linear'                                
                                 if params.optionNoiseThresh
-                                    plot([params.SC_lower_bound_Hz,params.SC_upper_bound_Hz],params.NoiseThresh_Pa(nChan)*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
+                                    plot([mean(arams.SC_lower_bound_Hz),params.SC_upper_bound_Hz],params.NoiseThresh_Pa(nChan)*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
                                     plot(fVec__halfSpec(indRangeAnalysisWindow),audioData_slices_DFT_mag_halfSpec_copy(indRangeAnalysisWindow,indexSoundLevelMin),'g','Parent', ax(nChan))
                                 end
                                 plot(fVec__halfSpec(indRangeAnalysisWindow),audioData_slices_DFT_mag_halfSpec(indRangeAnalysisWindow,indexSoundLevelMin),'Parent', ax(nChan))
                                 %plot(fVec_Harmonics,AVec_harmonics_linear,'Parent', ax(nChan),'LineWidth',figLineHarmonics,'Color','k');
                             case 'log'
                                 if params.optionNoiseThresh
-                                    plot([params.SC_lower_bound_Hz,params.SC_upper_bound_Hz],20*log10(params.NoiseThresh_Pa(nChan))*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
+                                    plot([mean(params.SC_lower_bound_Hz),params.SC_upper_bound_Hz],20*log10(params.NoiseThresh_Pa(nChan))*ones(2,1),'r','LineWidth',2,'Parent', ax(nChan))
                                     plot(fVec__halfSpec(indRangeAnalysisWindow),20*log10(audioData_slices_DFT_mag_halfSpec_copy(indRangeAnalysisWindow,indexSoundLevelMin)),'g','Parent', ax(nChan))
                                 end
                                 plot(fVec__halfSpec(indRangeAnalysisWindow),20*log10(audioData_slices_DFT_mag_halfSpec(indRangeAnalysisWindow,indexSoundLevelMin)),'Parent', ax(nChan))
