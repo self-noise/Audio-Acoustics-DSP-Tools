@@ -2,7 +2,7 @@
 % FUNCTION NAME AND SPECIFICATION
 %
 %   [SC_normalised_frames,SC_frames,frame_RMS_levels,tVec_FrameCentres] = ...
-%           MJN_SpectralCentroid_SlidingWindow(params,audioData)
+%           MJN_SpectralCentroid_SlidingWindow(params,audioData,options,varargin)
 %---------------------------------------------------------------------------------------------%
 % PURPOSE OF THIS FUNCTION:
 %           (1) Computes the normalised spectral centroid (NSC) of a time domain signal
@@ -16,7 +16,7 @@
 % INPUTS:
 %           params                      Structure containing all control parameters
 %               .Fs                     Sample rate of audio signals
-%               .params.f0_nominal      The reference frequency for NSC
+%               .f0_nominal             The reference frequency for NSC
 %                                       calculations (i.e., expected
 %                                       playing frequency for the given
 %                                       note) in Hz
@@ -28,7 +28,7 @@
 %                                       'wholeSignal', in which case no windowing will
 %                                       happen and a single SC and NSC will be returned
 %                                       for each input channel
-%               .params.windowType      ['Hann', 'Rect', or 'Blackman']
+%               .windowType             ['Hann', 'Rect', or 'Blackman']
 %                                       Type of window applied to each
 %                                       analysis frame
 %               .overlapFraction        [0:1]
@@ -50,7 +50,7 @@
 %               .f0_Method
 %               .f0_rangeLow
 %               .f0_rangeHigh
-%               .f0_nominal
+%               .f_lower_offset
 %               .optionCleanTail
 %               .optionNoiseThresh
 %               .NoiseThresh_Pa
@@ -92,8 +92,11 @@
 %   NOTE 1:
 %---------------------------------------------------------------------------------------------%
 % CHANGES TO ADD AT SOME POINT IN THE FUTURE:
-%   "specData" changes size on each loop, adding a new entry to the structure for each channel in
-%   sequence. This should be optimised/pre-allocated.
+%   "specData" changes size on each loop, adding a new entry to the structure for each channel 
+%   in sequence. This should be optimised/pre-allocated.
+%
+%   Add error checking for orientation of "audioData" in cases where rows are sent in rather 
+%   than columns (and reshape accordingly)
 %---------------------------------------------------------------------------------------------%
 % CHANGELOG:
 %   2024-10-08: Further changes implemented
@@ -121,11 +124,13 @@
 function [SC_normalised_frames,SC_frames,frame_RMS_levels,tVec_FrameCentres,f0_estimate,SC_lower_bound_Hz] = MJN_SpectralCentroid_SlidingWindow(params,audioData,options,varargin)
 
 % Write optional variables to more logical names
-if varargin{1}
-    n_File      = varargin{1};
-end
-if varargin{2}
-    Path_File   = varargin{2};
+if ~isempty(varargin)
+    if varargin{1}
+        n_File      = varargin{1};
+    end
+    if varargin{2}
+        Path_File   = varargin{2};
+    end
 end
 
 N_channels                  = size(audioData,2);                                        % Number of mic channels

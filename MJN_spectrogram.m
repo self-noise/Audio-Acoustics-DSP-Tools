@@ -91,9 +91,17 @@ switch params.windowType
         win                  = 0.5*(1 - cos(2*pi*(0:N_frame-1)'/N_frame)); % Manual computation of Hann window
     case 'Rect'
         win                  = ones(N_frame,1); % All ones
+    case 'Blackman'
+        % Blackman window (manual computation
+        win                  = (0.42 - 0.5*cos(2*pi*(0:N_frame-1)/(N_frame-1)) + 0.08*cos(4*pi*(0:N_frame-1)/(N_frame-1)))';
+        win                  = win/(mean(win));
     otherwise
         error('Error: You have not specified a valid window type')
 end
+
+
+
+
 
 % Derived frequency domain parameters for each slice (full bandwidth as
 % determined by sample rate and frame length)

@@ -98,7 +98,7 @@ for jChannels = 1:nChannels
     
     % Apply ylimits for current signal, if requested        
     if ~isempty(varargin)
-        ylim(varargin{jChannels})        
+        ylim(varargin(jChannels,:))        
     end
 end
 linkaxes(ax,'x');
